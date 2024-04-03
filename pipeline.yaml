@@ -1,0 +1,61 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: cloud-deploy # name of the deilvery pipeline
+description: its a deilvery pipeline configuration
+serialPipeline:
+  stages:
+  - targetId: dev # can be anything
+    profiles:
+     - dev # taken from skaffold.yaml
+    strategy:
+      standard:
+        verify: true # true only if skaffold.yaml has verify step. 
+  - targetId: non-prod # can be anything or env name(qa/UAT/dev/prod etc)
+    profiles:
+     - non-prod  # taken from skaffold.yaml
+    strategy:
+      standard:
+        verify: true
+        postdeploy:
+          actions:
+          - em-verify-test # taken from skaffold.yaml
+
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: dev # its the target id from above 
+description: dev cluster
+gke:
+  cluster: projects/arifash-test/locations/us-central1/clusters/test-cluster
+  internalIp: true
+executionConfigs:
+- usages:
+  - RENDER
+  - PREDEPLOY
+  - DEPLOY
+  - VERIFY
+  - POSTDEPLOY
+  privatePool:
+    workerPool: projects/gcb-catalog-testing/locations/us-central1/workerPools/cloud-deploy-test
+    serviceAccount: gcb-catalog-e2e-testing@gcb-catalog-testing.iam.gserviceaccount.com
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: non-prod # its the target id from above
+description: non-prod cluster
+gke:
+  cluster: projects/gcb-catalog-testing/locations/us-central1/clusters/catalog-integration-test-gke-cluster
+  internalIp: true
+executionConfigs:
+- usages:
+  - RENDER
+  - PREDEPLOY
+  - DEPLOY
+  - VERIFY
+  - POSTDEPLOY
+  privatePool:
+    workerPool: projects/gcb-catalog-testing/locations/us-central1/workerPools/cloud-deploy-test
+    serviceAccount: gcb-catalog-e2e-testing@gcb-catalog-testing.iam.gserviceaccount.com
