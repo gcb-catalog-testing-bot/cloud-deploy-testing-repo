@@ -1,2 +1,2 @@
 README.md
-TEST
+Required config files for testing stepAction cloud-deploy
