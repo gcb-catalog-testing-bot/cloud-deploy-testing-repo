@@ -28,7 +28,7 @@ metadata:
   name: dev # its the target id from above 
 description: dev cluster
 gke:
-  cluster: projects/arifash-test/locations/us-central1/clusters/test-cluster
+  cluster: projects/gcb-catalog-testing/locations/us-central1/clusters/catalog-integration-test-gke-cluster
   internalIp: true
 executionConfigs:
 - usages:
